@@ -34,13 +34,13 @@ class Network(object):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backdrop(x,y)
+            delta_nabla_b, delta_nabla_w = self.backprop(x,y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         self.biases = [b-(learning_rate/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)]
         self.weights = [w-(learning_rate/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
     
-    def backdrop(self, x, y):
+    def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
@@ -80,5 +80,5 @@ def sigmoid_prime(z):
 
 if __name__ == '__main__':
     training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
-    net = Network([784,30,10])
-    net.StochasticGradientDecent(training_data, 30 , 10, 3.0, test_data=test_data)
+    net = Network([784,16,16,10])
+    net.StochasticGradientDecent(training_data, 30 , 10, 3.1415, test_data=test_data)
