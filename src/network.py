@@ -1,5 +1,6 @@
 import numpy as np
-import os
+import mnist_loader
+import random
 
 class Network(object):
 
@@ -7,7 +8,7 @@ class Network(object):
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.rand(y, x) for x,y in zip(sizes[:-1], sizes[1:])]
+        self.weights = [np.random.randn(y, x) for x,y in zip(sizes[:-1], sizes[1:])]
     
     def feedforward(self, a):
         for bias, weight in zip(self.biases, self.weights):
@@ -16,16 +17,15 @@ class Network(object):
     
     def StochasticGradientDecent(self, training_data, epochs, mini_batch_size, learning_rate, test_data = None):
         # training_data is list of tuples '(training_input,expected_output)'
+        if test_data: n_test = len(test_data)
         n = len(training_data)
         for epoch in range(epochs):
-            np.random.shuffle(training_data)
-            mini_batches = [
-                training_data[i:i+mini_batch_size]
-                for i in range(0, n, mini_batch_size)]
+            random.shuffle(training_data)
+            mini_batches = [ training_data[i:i+mini_batch_size] for i in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, learning_rate)
             if test_data:
-                print(f"Epoch {epoch}: {self.evaluate(test_data)} / {len(test_data)}")
+                print(f"Epoch {epoch}: {self.evaluate(test_data)} / {n_test}")
             else:
                 print(f"Epoch {epoch} complete")
 
@@ -37,8 +37,8 @@ class Network(object):
             delta_nabla_b, delta_nabla_w = self.backdrop(x,y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w-(learning_rate/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
         self.biases = [b-(learning_rate/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)]
+        self.weights = [w-(learning_rate/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
     
     def backdrop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -49,20 +49,20 @@ class Network(object):
         zs = []
 
         for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
+            z = np.dot(w, activation) +b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
-        delta = self.cost_derivative(activation[-1],y) * sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
 
         for l in range(2, self.num_layers):
-            z = zs[-1]
+            z = zs[-l]
             sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-1+1].transpose(), delta) * sp
-            nabla_b[-1] = delta
-            nabla_w[-1] = np.dot(delta, activations[-1-1].transpose())
+            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
@@ -72,9 +72,13 @@ class Network(object):
     def cost_derivative(self, output_activations, y):
         return (output_activations - y)
 
-
 def sigmoid(z):
     return 1.0/(1.0+np.exp(-z))
 
 def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
+
+if __name__ == '__main__':
+    training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+    net = Network([784,30,10])
+    net.StochasticGradientDecent(training_data, 30 , 10, 3.0, test_data=test_data)
