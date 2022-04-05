@@ -36,9 +36,9 @@ class Network(object):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
         for actual, expected in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(actual,expected)
-            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
-            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+            gradient_costFn_b, gradient_costFn_w = self.backprop(actual,expected)
+            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, gradient_costFn_b)]
+            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, gradient_costFn_w)]
         self.biases = [b-(learning_rate/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)]
         self.weights = [w-(learning_rate/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
     
@@ -51,7 +51,7 @@ class Network(object):
         activations = [actual]
         zs = []
 
-        # This is like feedforward fn but appends zs
+        # This is like feedforward() but appends zs
         for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation) + b
             zs.append(z)
@@ -59,14 +59,14 @@ class Network(object):
             activations.append(activation)
 
         # backward pass
-        delta = self.cost_derivative(activations[-1], expected) * sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], expected) * sigmoid_derivative(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
 
         for l in range(2, self.num_layers):
             z = zs[-l]
-            sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            sd = sigmoid_derivative(z)
+            delta = np.dot(self.weights[-l+1].transpose(), delta) * sd
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
@@ -76,15 +76,15 @@ class Network(object):
         return sum(int(actual == expect) for (actual,expect) in test_results)
     
     def cost_derivative(self, output_activations, expected):
-        return pow(output_activations - expected, 2)
+        return output_activations - expected
 
 def sigmoid(z):
     return 1.0/(1.0+np.exp(-z))
 
-def sigmoid_prime(z):
+def sigmoid_derivative(z):
     return sigmoid(z)*(1-sigmoid(z))
 
 if __name__ == '__main__':
     training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
-    net = Network([784,16,16,10])
-    net.StochasticGradientDecent(training_data, 30 , 10, 3.1415, test_data=test_data)
+    net = Network([784,10,10])
+    net.StochasticGradientDecent(training_data, 30 , 10, 3.0, test_data=test_data)
