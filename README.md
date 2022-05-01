@@ -5,15 +5,13 @@ This Deep Learning algorithm was written using the [Neural Network Book by Micha
 ## How to start it
 1. Clone this repository
 2. Install Python
-3. Install the requirements.txt `$ pip install -r requirements.txt`
-4. Start the program by starting `network.py`. For example `$ python src/network.py`
-5. Wait
-
-You may need a Virtual Environment:
-1. Create the environment `$ python -m venv /path/to/new/virtual/environment`
-2. Source the virtual environment:
+3. Create a virtual environment `$ python -m venv /path/to/new/virtual/environment`
+4. Source the virtual environment:
     - Mac OS/Linux: `$ source venv/bin/activate`
     - Windows: `$ source venv/Scripts/activate`
+5. Install the requirements.txt `$ pip install -r requirements.txt`
+6. Start the program by starting `network.py`. For example `$ python src/network.py`
+7. Wait
 
 ## Output
 The output of the program displays the different epochs and a number corresponding to the amount of images the program has classified correctly.
