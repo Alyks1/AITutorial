@@ -5,12 +5,12 @@ This Deep Learning algorithm was written using the [Neural Network Book by Micha
 ## How to start it
 1. Clone this repository
 2. Install Python
-3. Create a virtual environment `$ python -m venv /path/to/new/virtual/environment`
+3. Create a virtual environment `$ python -m venv env`
 4. Source the virtual environment:
-    - Mac OS/Linux: `$ source venv/bin/activate`
-    - Windows: `$ source venv/Scripts/activate`
+    - Mac OS/Linux: `$ source env/bin/activate`
+    - Windows: `$ source env/Scripts/activate`
 5. Install the requirements.txt `$ pip install -r requirements.txt`
-6. Start the program by starting `network.py`. For example `$ python src/network.py`
+6. Start the program by running `$ python src/network.py`
 7. Wait
 
 ## Output
