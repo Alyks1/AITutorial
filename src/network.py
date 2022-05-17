@@ -10,11 +10,6 @@ class Network(object):
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x) for x,y in zip(sizes[:-1], sizes[1:])]
     
-    def feedforward(self, a):
-        for bias, weight in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(weight,a)+bias)
-        return a
-    
     def StochasticGradientDecent(self, training_data, epochs, mini_batch_size, learning_rate, test_data = None):
         # training_data is list of tuples '(training_input,expected_output)'
         if test_data: n_test = len(test_data)
@@ -32,23 +27,25 @@ class Network(object):
                 print(f"Epoch {epoch} complete")
 
     def update_mini_batch(self, mini_batch, learning_rate):
+        # creates matrix
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
-        for actual, expected in mini_batch:
-            gradient_costFn_b, gradient_costFn_w = self.backprop(actual,expected)
+        for input, expected in mini_batch:
+            gradient_costFn_b, gradient_costFn_w = self.backprop(input,expected)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, gradient_costFn_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, gradient_costFn_w)]
+
         self.biases = [b-(learning_rate/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)]
         self.weights = [w-(learning_rate/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
     
-    def backprop(self, actual, expected):
+    def backprop(self, input, expected):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
         # Feed Forward
-        activation = actual
-        activations = [actual]
+        activation = input
+        activations = [input]
         zs = []
 
         # This is like feedforward() but appends zs
@@ -72,7 +69,7 @@ class Network(object):
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
-        test_results = [(np.argmax(self.feedforward(actual)), expect) for (actual,expect) in test_data]
+        test_results = [(np.argmax(self.feedforward(input)), expect) for (input,expect) in test_data]
         return sum(int(actual == expect) for (actual,expect) in test_results)
     
     def cost_derivative(self, output_activations, expected):
@@ -83,6 +80,11 @@ def sigmoid(z):
 
 def sigmoid_derivative(z):
     return sigmoid(z)*(1-sigmoid(z))
+
+def feedforward(self, a):
+    for bias, weight in zip(self.biases, self.weights):
+        a = sigmoid(np.dot(weight,a)+bias)
+    return a
 
 if __name__ == '__main__':
     training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
