@@ -30,7 +30,7 @@ Epoch 10: 9595 / 10000
 ```
 Here, after 10 Epochs the Network distinguishes 9595 out of 10000 images correctly. Thats almost 96%!
 
-Epoch 0: 7463 / 10000
+```Epoch 0: 7463 / 10000
 Epoch 1: 7547 / 10000
 Epoch 2: 7647 / 10000
 Epoch 3: 7652 / 10000
@@ -60,3 +60,4 @@ Epoch 26: 9572 / 10000
 Epoch 27: 9583 / 10000
 Epoch 28: 9568 / 10000
 Epoch 29: 9586 / 10000
+```
